@@ -1,14 +1,17 @@
 "use client";
 import React from "react";
-import { LaWalletProvider } from "@lawallet/react";
+import { LaWalletConfig } from "@lawallet/react";
 import { config } from "@/config";
 import AuthWrapper from "./AuthWrapper";
+import { AppContext } from "@/context/AppContext";
 
 const AppWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
-    <LaWalletProvider config={config}>
-      <AuthWrapper>{children}</AuthWrapper>
-    </LaWalletProvider>
+    <LaWalletConfig config={config}>
+      <AuthWrapper>
+        <AppContext>{children}</AppContext>
+      </AuthWrapper>
+    </LaWalletConfig>
   );
 };
 

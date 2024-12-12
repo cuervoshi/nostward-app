@@ -1,10 +1,6 @@
 import { STORAGE_KEY } from "@/config";
-import {
-  parseContent,
-  useConfig,
-  useIdentity,
-  useNostr,
-} from "@lawallet/react";
+import { parseContent, useConfig, useNostr } from "@lawallet/react";
+import { NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
 
@@ -33,21 +29,19 @@ const isProtectedRoute = (path: string, paths: string[]): boolean => {
 };
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { signer, validateRelaysStatus, initializeSigner } = useNostr();
+  const { validateRelaysStatus, initializeSigner, signerInfo } = useNostr();
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
   const router = useRouter();
   const config = useConfig();
   const pathname = usePathname();
-  const identity = useIdentity();
 
   const authenticate = async (privateKey: string) => {
-    const initialized: boolean = await identity.initializeFromPrivateKey(
-      privateKey
-    );
+    const tmpSigner = new NDKPrivateKeySigner(privateKey);
+    await tmpSigner.blockUntilReady();
 
-    if (initialized) initializeSigner(identity.signer);
+    if (tmpSigner) initializeSigner(tmpSigner);
 
     await config.storage.setItem(STORAGE_KEY, JSON.stringify({ privateKey }));
 
@@ -87,16 +81,15 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (signer && !identity.signer) {
-      setIsLoading(true);
+  // useEffect(() => {
+  //   if (signer && !identity.signer) {
+  //     setIsLoading(true);
 
-      signer.user().then(async (user) => {
-        await identity.initializeIdentityFromPubkey(user.pubkey);
-        setIsLoading(false);
-      });
-    }
-  }, [signer, identity]);
+  //     signer.user().then(async (user) => {
+  //       setIsLoading(false);
+  //     });
+  //   }
+  // }, [signer, signerInfo]);
 
   useEffect(() => {
     if (!isLoading) {
@@ -110,7 +103,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
         AppRouter.disconnectedPaths
       );
 
-      const userConnected: boolean = Boolean(identity.pubkey.length);
+      const userConnected: boolean = Boolean(signerInfo?.pubkey.length);
 
       switch (true) {
         case !userConnected && requireAuth:
@@ -122,7 +115,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
           break;
       }
     }
-  }, [pathname, identity.pubkey, isLoading]);
+  }, [pathname, signerInfo, isLoading]);
 
   const hydrateApp = useMemo((): boolean => {
     if (isLoading) return false;
@@ -137,13 +130,13 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
       AppRouter.disconnectedPaths
     );
 
-    const userConnected: boolean = Boolean(identity.pubkey.length);
+    const userConnected: boolean = Boolean(signerInfo?.pubkey.length);
 
     if (userConnected && requireAuth) return true;
     if (!userConnected && requireDisconnectedUser) return true;
 
     return Boolean(!requireAuth && !requireDisconnectedUser);
-  }, [isLoading, pathname, identity.pubkey]);
+  }, [isLoading, pathname, signerInfo]);
 
   return !hydrateApp ? <div>Loading</div> : children;
 };

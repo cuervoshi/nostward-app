@@ -25,20 +25,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import useCredits from "@/hooks/useCredits";
 import { buildBuyCreditsEvent } from "@/lib/events";
 import { buyCreditsRequest } from "@/lib/interceptors";
 import {
   nowInSeconds,
   useConfig,
-  useIdentity,
+  useNostr,
   useSubscription,
 } from "@lawallet/react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { copy } from "@/lib/utils";
 import { NDKKind, NostrEvent } from "@nostr-dev-kit/ndk";
 import { NOSTWARD_ADMIN_KEY } from "@/config";
+import { NostWardContext } from "@/context/AppContext";
 
 const creditOptions = [
   { value: "100", label: "100 créditos" },
@@ -47,10 +47,10 @@ const creditOptions = [
 ];
 
 export default function Credits() {
-  const identity = useIdentity();
   const config = useConfig();
+  const { signEvent, signerInfo } = useNostr();
 
-  const { credits, creditsLog } = useCredits();
+  const { credits, creditsLog } = useContext(NostWardContext);
 
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [invoice, setInvoice] = useState<{ pr: string; createdAt: number }>({
@@ -75,8 +75,10 @@ export default function Credits() {
   const calculateSats = (credits: number) => Math.floor(credits / 10);
 
   const generatePayment = async () => {
-    const buyEvent: NostrEvent | undefined = await identity.signEvent(
-      buildBuyCreditsEvent(identity.pubkey, selectedCredits) as NostrEvent
+    if (!signerInfo) return;
+
+    const buyEvent: NostrEvent | undefined = await signEvent(
+      buildBuyCreditsEvent(signerInfo.pubkey, selectedCredits) as NostrEvent
     );
 
     if (buyEvent) {

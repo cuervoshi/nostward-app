@@ -2,18 +2,18 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import React, { ChangeEvent, useState } from "react";
-import { useConfig, useIdentity, useNostr } from "@lawallet/react";
+import { useConfig, useNostr } from "@lawallet/react";
 import { useRouter } from "next/navigation";
 import { STORAGE_KEY } from "@/config";
 import { bytesToHex } from "@noble/hashes/utils";
 import { generateSecretKey } from "nostr-tools";
+import { NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
 
 export default function Home() {
   const { authWithExtension, initializeSigner } = useNostr();
   const [inputKey, setInputKey] = useState<string>("");
 
   const router = useRouter();
-  const identity = useIdentity();
   const config = useConfig();
 
   const handleChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
@@ -21,12 +21,11 @@ export default function Home() {
   };
 
   const handleLoginWithSecretKey = async (secretKey: string) => {
-    const initialized: boolean = await identity.initializeFromPrivateKey(
-      secretKey
-    );
+    const tmpSigner = new NDKPrivateKeySigner(secretKey);
+    await tmpSigner.blockUntilReady();
 
-    if (initialized) {
-      initializeSigner(identity.signer);
+    if (tmpSigner) {
+      initializeSigner(tmpSigner);
 
       await config.storage.setItem(
         STORAGE_KEY,

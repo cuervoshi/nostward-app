@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, CreditCard, Bell, LogOut } from "lucide-react";
 import { STORAGE_KEY } from "@/config";
-import { useConfig, useIdentity } from "@lawallet/react";
+import { useConfig, useNostr } from "@lawallet/react";
 import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
@@ -12,9 +12,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // const { initializeSigner } = useNostr();
+  const { initializeSigner } = useNostr();
   const config = useConfig();
-  const identity = useIdentity();
   const router = useRouter();
 
   const handleLogout = async () => {
@@ -24,8 +23,7 @@ export default function DashboardLayout({
 
     if (confirmation) {
       await config.storage.removeItem(STORAGE_KEY);
-      identity.reset();
-
+      initializeSigner(undefined);
       router.push("/");
     }
   };
