@@ -3,6 +3,7 @@ import { parseContent, useConfig, useNostr } from "@lawallet/react";
 import { NDKPrivateKeySigner } from "@nostr-dev-kit/ndk";
 import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useMemo } from "react";
+import AppLoader from "./AppLoader";
 
 interface RouterInfo {
   disconnectedPaths: string[]; // Routes that require you to NOT have a connected account
@@ -138,7 +139,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     return Boolean(!requireAuth && !requireDisconnectedUser);
   }, [isLoading, pathname, signerInfo]);
 
-  return !hydrateApp ? <div>Loading</div> : children;
+  return !hydrateApp ? <AppLoader /> : children;
 };
 
 export default AuthWrapper;

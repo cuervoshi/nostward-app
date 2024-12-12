@@ -21,7 +21,7 @@ export default function Subscriptions() {
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold mb-4">Subscripciones</h1>
-      <Link href="/subscriptions/create">
+      <Link href="/dashboard/subscriptions/create">
         <Button className="mb-4 bg-[#151515] hover:bg-gray-800 text-gray-100 border-none">
           Crear subscripción
         </Button>
