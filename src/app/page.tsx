@@ -8,8 +8,6 @@ import { STORAGE_KEY } from "@/config";
 import { bytesToHex } from "@noble/hashes/utils";
 import { generateSecretKey } from "nostr-tools";
 
-const hexRegex = /^[0-9a-fA-F]+$/;
-
 export default function Home() {
   const { authWithExtension, initializeSigner } = useNostr();
   const [inputKey, setInputKey] = useState<string>("");
@@ -23,10 +21,6 @@ export default function Home() {
   };
 
   const handleLoginWithSecretKey = async (secretKey: string) => {
-    if (!hexRegex.test(secretKey)) {
-      return;
-    }
-
     const initialized: boolean = await identity.initializeFromPrivateKey(
       secretKey
     );

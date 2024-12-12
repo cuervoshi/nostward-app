@@ -52,6 +52,34 @@ export default function Credits() {
             Comprar créditos
           </Button>
         </DialogTrigger>
+
+        {/* Content invoice  */}
+        {/* <DialogContent className="bg-[#151515] text-gray-100 flex flex-col items-center justify-center space-y-4">
+          <DialogHeader className="w-full">
+            <DialogTitle className="text-left">Realiza el pago</DialogTitle>
+            <DialogDescription className="text-left">
+              Debes pagar la siguiente factura de Lightning Network
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="p-4 bg-white rounded-lg">
+            <QRCodeSVG size={300} value="asfgsdefsdd" />
+          </div>
+
+          <div className="flex flex-col items-center justify-center">
+            <p className="text-sm text-gray-400 mb-2">Esperando el pago...</p>
+            <div className="w-8 h-8 border-4 border-gray-100 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+
+          <DialogFooter className="flex space-x-4">
+            <Button className="bg-[#0c0c0c] hover:bg-gray-800 text-gray-100 border-none">
+              Cancelar
+            </Button>
+            <Button className="bg-[#0c0c0c] hover:bg-gray-800 text-gray-100 border-none">
+              Copiar
+            </Button>
+          </DialogFooter>
+        </DialogContent> */}
         <DialogContent className="bg-[#151515] text-gray-100">
           <DialogHeader>
             <DialogTitle>Comprar créditos</DialogTitle>
@@ -59,6 +87,7 @@ export default function Credits() {
               Selecciona la cantidad de créditos que deseas comprar.
             </DialogDescription>
           </DialogHeader>
+
           <Select onValueChange={setSelectedCredits}>
             <SelectTrigger className="bg-[#0c0c0c] text-gray-100 border-gray-700">
               <SelectValue placeholder="Selecciona cantidad de créditos" />
@@ -71,9 +100,11 @@ export default function Credits() {
               ))}
             </SelectContent>
           </Select>
+
           {selectedCredits && (
             <p>Precio: {calculateSats(parseInt(selectedCredits))} sats</p>
           )}
+
           <DialogFooter>
             <Button className="bg-[#0c0c0c] hover:bg-gray-800 text-gray-100 border-none">
               Generar factura
