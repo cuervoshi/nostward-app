@@ -33,7 +33,7 @@ const isProtectedRoute = (path: string, paths: string[]): boolean => {
 };
 
 const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
-  const { validateRelaysStatus, initializeSigner } = useNostr();
+  const { signer, validateRelaysStatus, initializeSigner } = useNostr();
 
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
@@ -88,6 +88,17 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    if (signer && !identity.signer) {
+      setIsLoading(true);
+
+      signer.user().then(async (user) => {
+        await identity.initializeIdentityFromPubkey(user.pubkey);
+        setIsLoading(false);
+      });
+    }
+  }, [signer, identity]);
+
+  useEffect(() => {
     if (!isLoading) {
       const pathSegment = `/${String(pathname.split("/")[1] ?? "")}`;
       const requireAuth = isProtectedRoute(
@@ -111,7 +122,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
           break;
       }
     }
-  }, [pathname, identity, isLoading]);
+  }, [pathname, identity.pubkey, isLoading]);
 
   const hydrateApp = useMemo((): boolean => {
     if (isLoading) return false;
@@ -132,7 +143,7 @@ const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
     if (!userConnected && requireDisconnectedUser) return true;
 
     return Boolean(!requireAuth && !requireDisconnectedUser);
-  }, [isLoading, pathname, identity]);
+  }, [isLoading, pathname, identity.pubkey]);
 
   return !hydrateApp ? <div>Loading</div> : children;
 };
