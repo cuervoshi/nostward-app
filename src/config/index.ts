@@ -5,6 +5,8 @@ export const STORAGE_KEY: string = "user_secret_key";
 export const NOSTWARD_ADMIN_KEY: string =
   "3f5a30545c6044c8ac445cd21b36921faf0c337e0ab59bde99e6cb864e971c68";
 
+export const API_DEFAULT_URL: string = "https://api.lnbot.io";
+
 const storage = createStorage({
   storage: {
     async getItem(name) {

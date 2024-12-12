@@ -1,7 +1,8 @@
+import { API_DEFAULT_URL } from "@/config";
 import { NostrEvent } from "@nostr-dev-kit/ndk";
 
 export const buyCreditsRequest = async (event: NostrEvent) => {
-  return fetch("http://147.79.83.24:3000/credits/request", {
+  return fetch(`${API_DEFAULT_URL}/credits/request`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
