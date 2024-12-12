@@ -3,12 +3,33 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { LayoutDashboard, CreditCard, Bell, LogOut } from "lucide-react";
+import { STORAGE_KEY } from "@/config";
+import { useConfig, useIdentity } from "@lawallet/react";
+import { useRouter } from "next/navigation";
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // const { initializeSigner } = useNostr();
+  const config = useConfig();
+  const identity = useIdentity();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const confirmation: boolean = confirm(
+      "¿Estás seguro que quieres cerrar sesión?"
+    );
+
+    if (confirmation) {
+      await config.storage.removeItem(STORAGE_KEY);
+      identity.reset();
+
+      router.push("/");
+    }
+  };
+
   return (
     <div className="flex h-screen bg-[#0c0c0c]">
       <aside className="w-64 bg-[#151515] text-gray-100 shadow-md">
@@ -42,7 +63,7 @@ export default function DashboardLayout({
           <Button
             className="w-full flex items-center justify-center bg-[#0c0c0c] hover:bg-gray-800 text-gray-100 border-none"
             variant="outline"
-            onClick={() => (window.location.href = "/")}
+            onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />
             Cerrar sesión

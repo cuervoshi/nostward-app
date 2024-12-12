@@ -1,3 +1,4 @@
+import AppWrapper from "@/components/layout/AppWrapper";
 import "./globals.css";
 import { Inter } from "next/font/google";
 
@@ -16,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-background text-foreground`}>
-        {children}
+        <AppWrapper>{children}</AppWrapper>
       </body>
     </html>
   );
